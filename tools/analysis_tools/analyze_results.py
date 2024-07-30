@@ -24,7 +24,7 @@ def bbox_map_eval(det_result, annotation, nproc=4):
     """Evaluate mAP of single image det result.
 
     Args:
-        det_result (list[list]): [[cls1_det, cls2_det, ...], ...].
+        det_result (list): [cls1_det, cls2_det, ...].
             The outer list indicates images, and the inner list indicates
             per-class detected bboxes.
         annotation (dict): Ground truth annotations where keys of
@@ -51,6 +51,7 @@ def bbox_map_eval(det_result, annotation, nproc=4):
     iou_thrs = np.linspace(
         .5, 0.95, int(np.round((0.95 - .5) / .05)) + 1, endpoint=True)
 
+    '''
     processes = []
     workers = Pool(processes=nproc)
     for thr in iou_thrs:
@@ -67,6 +68,11 @@ def bbox_map_eval(det_result, annotation, nproc=4):
     mean_aps = []
     for p in processes:
         mean_aps.append(p.get()[0])
+    '''
+    mean_aps = []
+    for thr in iou_thrs:
+        result = eval_map(bbox_det_result, [annotation], iou_thr=thr, logger='silent')
+        mean_aps.append(result[0])
 
     return sum(mean_aps) / len(mean_aps)
 
